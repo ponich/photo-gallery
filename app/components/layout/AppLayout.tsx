@@ -1,10 +1,10 @@
-import React, { ReactNode } from 'react';
+import React, { useState } from 'react';
 import { Album, Tag, Photo } from '@/app/types';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 
-interface AppLayoutProps {
-    children: ReactNode;
+export interface AppLayoutProps {
+    children: React.ReactNode;
     albums: Album[];
     tags: Tag[];
     photos: Photo[];
@@ -38,22 +38,14 @@ interface AppLayoutProps {
  * @param photos - Array of photos
  * @param selectedAlbum - Currently selected album ID
  * @param selectedTag - Currently selected tag ID
- * @param isMenuOpen - Whether the mobile menu is open
- * @param isSearchOpen - Whether the search input is open
- * @param searchTerm - Current search term
  * @param onAlbumSelect - Handler for selecting an album
  * @param onTagSelect - Handler for selecting a tag
- * @param onMenuToggle - Handler for toggling the mobile menu
- * @param onSearchToggle - Handler for toggling the search input
- * @param onSearchChange - Handler for changing the search term
- * @param onSearchClose - Handler for closing the search input
- * @param onHomeClick - Handler for clicking the home button
- * @param onAddPhoto - Handler for adding a photo
  * @param onCreateAlbum - Handler for creating an album
  * @param onCreateTag - Handler for creating a tag
  * @param onEditTag - Handler for editing a tag
  * @param onDeleteAlbum - Handler for deleting an album
  * @param onDeleteTag - Handler for deleting a tag
+ * @param onAddPhoto - Handler for adding a photo
  */
 const AppLayout: React.FC<AppLayoutProps> = ({
     children,
@@ -62,25 +54,25 @@ const AppLayout: React.FC<AppLayoutProps> = ({
     photos,
     selectedAlbum,
     selectedTag,
-    isMenuOpen,
-    isSearchOpen,
-    searchTerm,
     onAlbumSelect,
     onTagSelect,
-    onMenuToggle,
-    onSearchToggle,
-    onSearchChange,
-    onSearchClose,
-    onHomeClick,
-    onAddPhoto,
     onCreateAlbum,
     onCreateTag,
     onEditTag,
     onDeleteAlbum,
     onDeleteTag,
+    onAddPhoto,
 }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const onMenuToggle = () => setIsMenuOpen(!isMenuOpen);
+    const onHomeClick = () => {
+        onAlbumSelect('all');
+        onTagSelect(null);
+    };
+
     return (
-        <div className="min-h-screen bg-[#1d1d1f] text-gray-100 font-light overflow-x-hidden">
+        <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
             {/* Global styles for full background coverage */}
             <style jsx global>{`
                 body {
@@ -97,16 +89,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             `}</style>
 
             {/* TopBar component */}
-            <TopBar
-                isSearchOpen={isSearchOpen}
-                searchTerm={searchTerm}
-                onSearchChange={onSearchChange}
-                onSearchToggle={onSearchToggle}
-                onSearchClose={onSearchClose}
-                onMenuToggle={onMenuToggle}
-                onHomeClick={onHomeClick}
-                onAddPhoto={onAddPhoto}
-            />
+            <TopBar onMenuToggle={onMenuToggle} onHomeClick={onHomeClick} onAddPhoto={onAddPhoto} />
 
             {/* Sidebar component */}
             <Sidebar

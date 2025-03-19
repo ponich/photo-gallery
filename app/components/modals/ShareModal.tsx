@@ -37,7 +37,8 @@ const ShareModal: FC<ShareModalProps> = ({ url, onClose }) => {
                     <h3 className="text-xl font-medium text-gray-100">Share Photo</h3>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-700/50 rounded-full transition-colors"
+                        className="p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+                        title="Close"
                     >
                         <svg
                             className="w-5 h-5"

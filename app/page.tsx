@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Photo, Tag, Album } from './types';
 import { mockPhotos, mockTags, mockAlbums } from './mockData';
 
 // Components
 import AppLayout from './components/layout/AppLayout';
 import PhotoGrid from './components/ui/PhotoGrid';
-import PhotoDetailModal from './components/modals/PhotoDetailModal';
+import PhotoDetailModal from './components/modals/PhotoDetailModal/PhotoDetailModal';
 import ShareModal from './components/modals/ShareModal';
 import PhotoTagModal from './components/modals/PhotoTagModal';
 import TagManagementModal from './components/modals/TagManagementModal';
@@ -25,6 +25,7 @@ export default function Page() {
     const [photos, setPhotos] = useState<Photo[]>(mockPhotos);
     const [tags, setTags] = useState<Tag[]>(mockTags);
     const [albums, setAlbums] = useState<Album[]>(mockAlbums);
+    const [filteredPhotos, setFilteredPhotos] = useState<Photo[]>(mockPhotos);
 
     // State for UI
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,7 +61,7 @@ export default function Page() {
 
     // Custom hooks
     const {
-        filteredPhotos,
+        filteredPhotos: photoFilterFilteredPhotos,
         filters: { selectedAlbum, selectedTag, searchTerm },
         setSelectedAlbum,
         setSelectedTag,
@@ -82,24 +83,36 @@ export default function Page() {
         closeUploadModal,
     } = useModalState();
 
+    // Update filteredPhotos when photoFilterFilteredPhotos changes
+    useEffect(() => {
+        setFilteredPhotos(photoFilterFilteredPhotos);
+    }, [photoFilterFilteredPhotos]);
+
+    const handleSearch = useCallback(
+        (query: string) => {
+            setSearchTerm(query);
+        },
+        [setSearchTerm],
+    );
+
     // Function to navigate to previous/next photo
-    const navigatePhoto = (direction: 'prev' | 'next') => {
-        if (!selectedPhoto) return;
+    const navigatePhoto = useCallback(
+        (direction: 'prev' | 'next') => {
+            if (!selectedPhoto) return;
 
-        // Find current photo index
-        const currentIndex = filteredPhotos.findIndex((photo) => photo.id === selectedPhoto.id);
+            const currentIndex = filteredPhotos.findIndex((p) => p.id === selectedPhoto.id);
+            if (currentIndex === -1) return;
 
-        // Calculate new index
-        let newIndex;
-        if (direction === 'prev') {
-            newIndex = currentIndex > 0 ? currentIndex - 1 : filteredPhotos.length - 1;
-        } else {
-            newIndex = currentIndex < filteredPhotos.length - 1 ? currentIndex + 1 : 0;
-        }
+            let newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
 
-        // Set new selected photo
-        setSelectedPhoto(filteredPhotos[newIndex]);
-    };
+            // Loop around if we're at the ends
+            if (newIndex >= filteredPhotos.length) newIndex = 0;
+            if (newIndex < 0) newIndex = filteredPhotos.length - 1;
+
+            setSelectedPhoto(filteredPhotos[newIndex]);
+        },
+        [selectedPhoto, filteredPhotos],
+    );
 
     // Handle keyboard navigation
     useEffect(() => {
@@ -270,6 +283,12 @@ export default function Page() {
         setPhotos((prevPhotos) =>
             prevPhotos.map((p) => (p.id === photoId ? { ...p, album: albumId } : p)),
         );
+        setFilteredPhotos((prevFiltered) =>
+            prevFiltered.map((p) => (p.id === photoId ? { ...p, album: albumId } : p)),
+        );
+        if (selectedPhoto?.id === photoId) {
+            setSelectedPhoto({ ...selectedPhoto, album: albumId });
+        }
     };
 
     // Handler for updating a photo's details
@@ -277,8 +296,9 @@ export default function Page() {
         setPhotos((prevPhotos) =>
             prevPhotos.map((p) => (p.id === updatedPhoto.id ? updatedPhoto : p)),
         );
-
-        // Update the selected photo state as well
+        setFilteredPhotos((prevFiltered) =>
+            prevFiltered.map((p) => (p.id === updatedPhoto.id ? updatedPhoto : p)),
+        );
         setSelectedPhoto(updatedPhoto);
     };
 
@@ -326,70 +346,81 @@ export default function Page() {
         }
     };
 
+    const handleUploadClick = useCallback(() => {
+        // TODO: Implement upload functionality
+        console.log('Upload clicked');
+    }, []);
+
+    const handlePhotoClick = useCallback((photo: Photo) => {
+        setSelectedPhoto(photo);
+        // Reset any active filters when opening photo details
+        setIsSearchOpen(false);
+        setSearchTerm('');
+    }, []);
+
+    const handleCloseModal = useCallback(() => {
+        setSelectedPhoto(null);
+    }, []);
+
+    const handleShareClick = useCallback(
+        (url: string) => {
+            setShareUrl(url);
+            openShareModal();
+        },
+        [openShareModal],
+    );
+
     return (
-        <DropZone onFilesDropped={handleFilesDropped} className="min-h-screen">
-            <AppLayout
-                albums={albums}
-                tags={tags}
-                photos={photos}
-                selectedAlbum={selectedAlbum}
-                selectedTag={selectedTag}
-                isMenuOpen={isMenuOpen}
-                isSearchOpen={isSearchOpen}
-                searchTerm={searchTerm}
-                onAlbumSelect={setSelectedAlbum}
-                onTagSelect={setSelectedTag}
-                onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
-                onSearchToggle={() => setIsSearchOpen(true)}
-                onSearchChange={setSearchTerm}
-                onSearchClose={() => setIsSearchOpen(false)}
-                onHomeClick={() => {
-                    setSelectedAlbum('all');
-                    setSelectedTag(null);
-                    setSelectedPhoto(null);
-                }}
-                onAddPhoto={openUploadModal}
-                onCreateAlbum={openAlbumModal}
-                onCreateTag={() => {
-                    setEditingTag(null);
-                    openTagModal();
-                }}
-                onEditTag={handleEditTag}
-                onDeleteAlbum={handleAlbumDelete}
-                onDeleteTag={handleTagDelete}
-            >
-                <div className="p-6">
-                    <PhotoGrid
-                        photos={filteredPhotos}
-                        tags={tags}
-                        onPhotoSelect={setSelectedPhoto}
-                    />
-                </div>
-            </AppLayout>
+        <AppLayout
+            albums={albums}
+            tags={tags}
+            photos={photos}
+            selectedAlbum={selectedAlbum}
+            selectedTag={selectedTag}
+            isMenuOpen={isMenuOpen}
+            isSearchOpen={isSearchOpen}
+            searchTerm={searchTerm}
+            onAlbumSelect={setSelectedAlbum}
+            onTagSelect={setSelectedTag}
+            onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+            onSearchToggle={() => setIsSearchOpen(!isSearchOpen)}
+            onSearchChange={handleSearch}
+            onSearchClose={() => {
+                setIsSearchOpen(false);
+                handleSearch('');
+            }}
+            onHomeClick={() => {
+                setSelectedAlbum('all');
+                setSelectedTag(null);
+                handleSearch('');
+            }}
+            onAddPhoto={openUploadModal}
+            onCreateAlbum={openAlbumModal}
+            onCreateTag={handleNewTag}
+            onEditTag={handleEditTag}
+            onDeleteAlbum={handleAlbumDelete}
+            onDeleteTag={handleTagDelete}
+        >
+            <div className="container mx-auto px-4 py-8">
+                <PhotoGrid photos={filteredPhotos} tags={tags} onPhotoSelect={handlePhotoClick} />
+            </div>
 
-            {/* Hidden file input */}
-            <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                className="hidden"
-                multiple
-            />
-
-            {/* Modals */}
             {selectedPhoto && (
                 <div className="z-[100]">
                     <PhotoDetailModal
                         photo={selectedPhoto}
-                        onClose={() => setSelectedPhoto(null)}
+                        onClose={handleCloseModal}
                         onNavigate={navigatePhoto}
                         albums={albums}
                         tags={tags}
                         onAlbumChange={handlePhotoAlbumChange}
                         onTagsEdit={handleOpenTagEditor}
-                        onShare={handleSharePhoto}
+                        onShare={handleShareClick}
                         onPhotoUpdate={handlePhotoUpdate}
+                        isTagModalOpen={modalState.isPhotoTagModalOpen}
+                        closeTagModal={closePhotoTagModal}
+                        isShareModalOpen={modalState.isShareModalOpen}
+                        closeShareModal={closeShareModal}
                     />
                 </div>
             )}
@@ -443,11 +474,9 @@ export default function Page() {
                         onCreateAlbum={openAlbumModal}
                         photoMetadata={photoMetadata}
                         updatePhotoMetadata={(index, field, value) => {
-                            // If the field is 'tags', we can directly use updatePhotoTags
                             if (field === 'tags' && Array.isArray(value)) {
                                 updatePhotoTags(index, value);
                             } else {
-                                // For other fields, create a new object with the updated field
                                 setPhotoMetadata((prev) => {
                                     const updated = [...prev];
                                     if (!updated[index]) {
@@ -464,6 +493,6 @@ export default function Page() {
                     />
                 </div>
             )}
-        </DropZone>
+        </AppLayout>
     );
 }

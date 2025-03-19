@@ -55,7 +55,9 @@ export const TagItem = React.forwardRef<HTMLDivElement, TagItemProps>(
                     className={cn(
                         'flex items-center space-x-2 rounded-lg transition-all duration-300',
                         sizeClasses[size],
-                        isSelected ? 'bg-gray-700/50 shadow-lg' : 'hover:bg-gray-700/30',
+                        isSelected
+                            ? 'bg-accent text-accent-foreground shadow-lg'
+                            : 'hover:bg-accent/50',
                         onClick ? 'cursor-pointer' : 'cursor-default',
                         className,
                     )}
@@ -68,7 +70,7 @@ export const TagItem = React.forwardRef<HTMLDivElement, TagItemProps>(
                     <span className="font-medium truncate">{tag.name}</span>
 
                     {count !== undefined && (
-                        <span className="ml-auto text-xs text-gray-400">{count}</span>
+                        <span className="ml-auto text-xs text-muted-foreground">{count}</span>
                     )}
                 </button>
 
@@ -77,8 +79,7 @@ export const TagItem = React.forwardRef<HTMLDivElement, TagItemProps>(
                         {onEdit && (
                             <button
                                 onClick={onEdit}
-                                className="p-1 text-gray-400 hover:text-white"
-                                title="Edit tag"
+                                className="p-1 text-muted-foreground hover:text-foreground"
                             >
                                 <svg
                                     className="w-3.5 h-3.5"
@@ -98,8 +99,7 @@ export const TagItem = React.forwardRef<HTMLDivElement, TagItemProps>(
                         {onDelete && (
                             <button
                                 onClick={onDelete}
-                                className="p-1 text-gray-400 hover:text-white"
-                                title="Delete tag"
+                                className="p-1 text-muted-foreground hover:text-foreground"
                             >
                                 <svg
                                     className="w-3.5 h-3.5"

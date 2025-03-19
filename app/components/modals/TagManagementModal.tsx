@@ -51,14 +51,14 @@ const TagManagementModal: FC<TagManagementModalProps> = ({
 
     return (
         <div className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
-            <div className="bg-[#2d2d2f] rounded-xl p-6 w-full max-w-md">
-                <h3 className="text-xl font-medium mb-4 text-gray-100">
+            <div className="bg-background/95 backdrop-blur-xl rounded-xl p-6 w-full max-w-md">
+                <h3 className="text-xl font-medium mb-4 text-foreground">
                     {editingTag ? 'Edit Tag' : 'New Tag'}
                 </h3>
                 <div className="space-y-4">
                     <div>
                         <label
-                            className="block text-sm font-medium text-gray-400 mb-1"
+                            className="block text-sm font-medium text-muted-foreground mb-1"
                             htmlFor="tagName"
                         >
                             Name
@@ -67,14 +67,14 @@ const TagManagementModal: FC<TagManagementModalProps> = ({
                             id="tagName"
                             ref={inputRef}
                             type="text"
-                            className="w-full bg-[#1d1d1f] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
+                            className="w-full bg-accent/50 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent text-foreground placeholder:text-muted-foreground"
                             placeholder="Enter tag name"
                             value={tag.name}
                             onChange={(e) => setTag({ ...tag, name: e.target.value })}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                             Color
                         </label>
                         <div className="grid grid-cols-8 gap-2">
@@ -92,7 +92,7 @@ const TagManagementModal: FC<TagManagementModalProps> = ({
                                     key={color}
                                     className={`w-8 h-8 rounded-full ${
                                         tag.color === color
-                                            ? 'ring-2 ring-offset-2 ring-blue-500'
+                                            ? 'ring-2 ring-offset-2 ring-accent'
                                             : ''
                                     }`}
                                     style={{ backgroundColor: color }}
@@ -107,20 +107,20 @@ const TagManagementModal: FC<TagManagementModalProps> = ({
                     {editingTag && onDelete && (
                         <button
                             onClick={handleDelete}
-                            className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                            className="px-4 py-2 rounded-lg bg-destructive/20 text-destructive hover:bg-destructive/30 transition-colors"
                         >
                             Delete
                         </button>
                     )}
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 rounded-lg bg-gray-700/50 hover:bg-gray-700/70 transition-colors"
+                        className="px-4 py-2 rounded-lg bg-accent/50 hover:bg-accent/70 transition-colors text-accent-foreground"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors disabled:opacity-70 disabled:bg-blue-500/70 disabled:cursor-not-allowed"
+                        className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                         disabled={!tag.name.trim()}
                     >
                         {editingTag ? 'Save' : 'Create'}

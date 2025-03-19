@@ -55,22 +55,22 @@ export default function Sidebar({
     return (
         <nav
             className={`
-        fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-60 bg-[#2d2d2f]/95 text-gray-100
+        fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-60 bg-background/95 text-foreground
         transform transition-transform duration-300 ease-in-out backdrop-blur-xl
-        border-r border-gray-800/50 z-30 overflow-hidden flex flex-col
+        z-30 overflow-hidden flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
         ${className}
       `}
         >
-            <div className="flex flex-col h-full font-['SF Pro Display', 'Inter', 'system-ui', 'sans-serif'] overflow-y-auto">
+            <div className="flex flex-col h-full overflow-y-auto">
                 <div className="p-4 flex flex-col h-full">
                     {/* Albums Section */}
                     <div className="flex-1 min-h-0 mb-4">
-                        <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                        <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
                             <span>Albums</span>
                             <button
                                 onClick={onCreateAlbum}
-                                className="text-gray-400 hover:text-white p-0.5 rounded-full hover:bg-gray-700/30"
+                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-full hover:bg-accent/50"
                                 title="Create new album"
                             >
                                 <svg
@@ -97,8 +97,8 @@ export default function Sidebar({
                                         className={`w-full text-left py-1.5 px-3 rounded-lg transition-all duration-300 text-sm
                                             ${
                                                 selectedAlbum === album.id
-                                                    ? 'bg-gray-700/50 shadow-lg'
-                                                    : 'hover:bg-gray-700/30'
+                                                    ? 'bg-accent/80 text-accent-foreground'
+                                                    : 'hover:bg-accent/50 hover:text-accent-foreground'
                                             }`}
                                     >
                                         <span className="font-medium">{album.name}</span>
@@ -106,7 +106,7 @@ export default function Sidebar({
                                     {album.id !== 'all' && (
                                         <button
                                             onClick={() => onDeleteAlbum(album.id)}
-                                            className="p-1 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="p-1 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
                                             <svg
                                                 className="w-3.5 h-3.5"
@@ -130,11 +130,11 @@ export default function Sidebar({
 
                     {/* Tags Section */}
                     <div className="flex-1 min-h-0">
-                        <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                        <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 flex justify-between items-center">
                             <span>Tags</span>
                             <button
                                 onClick={onCreateTag}
-                                className="text-gray-400 hover:text-white p-0.5 rounded-full hover:bg-gray-700/30"
+                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-full hover:bg-accent/50"
                                 title="Create new tag"
                             >
                                 <svg
@@ -160,8 +160,8 @@ export default function Sidebar({
                                         onClick={() =>
                                             onTagSelect(tag.id === selectedTag ? null : tag.id)
                                         }
-                                        className={`w-full text-left py-1.5 px-3 rounded-lg transition-all duration-300 hover:bg-gray-700/30 flex items-center space-x-2 text-sm
-                                            ${selectedTag === tag.id ? 'bg-gray-700/50 shadow-lg' : ''}
+                                        className={`w-full text-left py-1.5 px-3 rounded-lg transition-all duration-300 hover:bg-accent/50 flex items-center space-x-2 text-sm
+                                            ${selectedTag === tag.id ? 'bg-accent/80 text-accent-foreground' : ''}
                                         `}
                                     >
                                         <span
@@ -170,7 +170,7 @@ export default function Sidebar({
                                         />
 
                                         <span className="font-medium truncate">{tag.name}</span>
-                                        <span className="ml-auto text-xs text-gray-400">
+                                        <span className="ml-auto text-xs text-muted-foreground">
                                             {
                                                 photos.filter(
                                                     (p: Photo) => p.tags && p.tags.includes(tag.id),
@@ -181,7 +181,7 @@ export default function Sidebar({
                                     <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={() => onEditTag(tag)}
-                                            className="p-1 text-gray-400 hover:text-white"
+                                            className="p-1 text-muted-foreground hover:text-foreground"
                                         >
                                             <svg
                                                 className="w-3.5 h-3.5"
@@ -199,7 +199,7 @@ export default function Sidebar({
                                         </button>
                                         <button
                                             onClick={() => onDeleteTag(tag.id)}
-                                            className="p-1 text-gray-400 hover:text-white"
+                                            className="p-1 text-muted-foreground hover:text-foreground"
                                         >
                                             <svg
                                                 className="w-3.5 h-3.5"

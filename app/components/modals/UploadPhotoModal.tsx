@@ -185,7 +185,7 @@ const UploadPhotoModal: FC<UploadPhotoModalProps> = ({
                     date: sharedMetadata.date,
                     orientation: sharedMetadata.orientation,
                     tags: metadata.tags,
-                };
+                } as unknown as Photo;
             });
 
             onUpload(photos);
@@ -202,6 +202,7 @@ const UploadPhotoModal: FC<UploadPhotoModalProps> = ({
     // Handle tag editing for the current photo
     const handleEditTags = () => {
         const tempPhoto: Photo = {
+            createdAt: sharedMetadata.date,
             id: currentImageIndex,
             url: uploadedImages[currentImageIndex] || '',
             title: currentMetadata.title,

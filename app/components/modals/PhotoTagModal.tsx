@@ -30,7 +30,7 @@ const PhotoTagModal: FC<PhotoTagModalProps> = ({
             tags: selectedTags,
         };
         onUpdateTags(updatedPhoto);
-    }, [selectedTags]);
+    }, [onUpdateTags, photo, selectedTags]);
 
     const handleTagToggle = (tagId: string) => {
         const isTagged = selectedTags.includes(tagId);
@@ -47,19 +47,14 @@ const PhotoTagModal: FC<PhotoTagModalProps> = ({
     };
 
     return (
-        <div
-            className="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4 modal-backdrop-animation"
-            onClick={onClose}
-        >
-            <div
-                className="bg-[#2d2d2f] rounded-xl p-6 w-full max-w-md modal-animation"
-                onClick={(e) => e.stopPropagation()}
-            >
+        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+            <div className="bg-modal rounded-xl p-6 w-full max-w-md">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-medium text-gray-100">Edit Tags</h3>
+                    <h3 className="text-xl font-medium text-foreground">Edit Tags</h3>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-700/50 rounded-full transition-colors"
+                        className="p-2 bg-button/10 rounded-full text-foreground hover:bg-button/20 transition-colors"
+                        title="Close"
                     >
                         <svg
                             className="w-5 h-5"
@@ -77,101 +72,52 @@ const PhotoTagModal: FC<PhotoTagModalProps> = ({
                     </button>
                 </div>
 
-                <div className="mb-6">
-                    <p className="text-sm text-gray-400 mb-2">
-                        Add or remove tags for &quot;{photo.title || 'New Photo'}&quot;
-                    </p>
+                <p className="text-sm text-foreground/60 mb-4">
+                    Add or remove tags for &quot;{photo.title}&quot;
+                </p>
 
-                    {selectedTags.length > 0 && (
-                        <div className="mb-4 bg-gray-800/60 p-3 rounded-lg">
-                            <p className="text-sm font-medium text-gray-400 mb-2">Selected tags:</p>
-                            <div className="flex flex-wrap gap-2">
-                                {selectedTags.map((tagId) => {
-                                    const tag = tags.find((t) => t.id === tagId);
-                                    if (!tag) return null;
-
-                                    return (
-                                        <div
-                                            key={`selected-${tag.id}`}
-                                            className="px-3 py-1 rounded-full text-sm flex items-center"
-                                            style={{
-                                                backgroundColor: `${tag.color}30`,
-                                                color: tag.color,
-                                            }}
-                                        >
-                                            {tag.name}
-                                            <button
-                                                onClick={() => handleTagToggle(tag.id)}
-                                                className="ml-1.5 p-0.5 rounded-full hover:bg-black/20 transition-colors"
-                                            >
-                                                <svg
-                                                    className="w-3 h-3"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M6 18L18 6M6 6l12 12"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-2">
-                        {tags.map((tag) => {
-                            const isTagged = selectedTags.includes(tag.id);
-                            return (
-                                <button
-                                    key={tag.id}
-                                    onClick={() => handleTagToggle(tag.id)}
-                                    className={`flex items-center space-x-3 w-full p-3 rounded-lg transition-colors ${
-                                        isTagged
-                                            ? 'bg-gray-700/80'
-                                            : 'bg-gray-800/40 hover:bg-gray-700/50'
-                                    }`}
+                <div className="flex flex-wrap gap-2 mb-6">
+                    {tags.map((tag) => (
+                        <button
+                            key={tag.id}
+                            className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center ${
+                                selectedTags.includes(tag.id)
+                                    ? 'opacity-100'
+                                    : 'opacity-50 hover:opacity-80'
+                            }`}
+                            style={{
+                                backgroundColor: `${tag.color}20`,
+                                color: tag.color,
+                            }}
+                            onClick={() => handleTagToggle(tag.id)}
+                        >
+                            {tag.name}
+                            {selectedTags.includes(tag.id) && (
+                                <svg
+                                    className="w-4 h-4 ml-1.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
                                 >
-                                    <span
-                                        className="w-4 h-4 rounded-full"
-                                        style={{ backgroundColor: tag.color }}
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M5 13l4 4L19 7"
                                     />
-
-                                    <span className="font-medium text-gray-100">{tag.name}</span>
-                                    {isTagged && (
-                                        <svg
-                                            className="w-5 h-5 ml-auto text-gray-100"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M5 13l4 4L19 7"
-                                            />
-                                        </svg>
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
+                                </svg>
+                            )}
+                        </button>
+                    ))}
                 </div>
 
-                <div className="flex justify-end space-x-3">
+                <div className="flex justify-between items-center">
                     <button
                         onClick={onCreateNewTag}
-                        className="px-4 py-2 rounded-lg bg-gray-700/50 hover:bg-gray-700/70 transition-colors flex items-center"
+                        className="flex items-center gap-2 bg-button/10 hover:bg-button/20 px-4 py-2 rounded-full text-sm text-foreground transition-colors"
                     >
                         <svg
-                            className="w-4 h-4 mr-2"
+                            className="w-4 h-4"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -183,11 +129,12 @@ const PhotoTagModal: FC<PhotoTagModalProps> = ({
                                 d="M12 4v16m8-8H4"
                             />
                         </svg>
-                        New Tag
+                        Create New Tag
                     </button>
+
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors"
+                        className="px-4 py-2 rounded-full bg-blue-500 hover:bg-blue-600 text-sm text-white transition-colors"
                     >
                         Done
                     </button>

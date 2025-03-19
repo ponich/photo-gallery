@@ -1,8 +1,8 @@
-import { Photo, Tag } from '@/app/types';
 import React from 'react';
 import { cn } from '@/app/lib/utils';
+import { Photo, Tag } from '@/app/types';
 
-export interface PhotoCardProps {
+interface PhotoCardProps {
     photo: Photo;
     tags: Tag[];
     onClick: (photo: Photo) => void;
@@ -10,11 +10,11 @@ export interface PhotoCardProps {
 }
 
 /**
- * PhotoCard component for displaying a photo in the grid
+ * PhotoCard component for displaying a photo with its metadata
  *
  * @param photo - Photo object to display
  * @param tags - Array of all available tags
- * @param onClick - Handler for clicking the photo
+ * @param onClick - Click handler for the photo
  * @param className - Additional CSS classes
  */
 export const PhotoCard = React.forwardRef<HTMLDivElement, PhotoCardProps>(
@@ -22,29 +22,22 @@ export const PhotoCard = React.forwardRef<HTMLDivElement, PhotoCardProps>(
         const isPortrait = photo.orientation === 'portrait';
         const isWide = photo.orientation === 'wide';
 
-        // Calculate grid span based on orientation
-        let spanClass = '';
-        let objectPosition = 'object-center';
+        // Determine grid span based on orientation
+        const spanClass = isPortrait ? 'row-span-2' : isWide ? 'col-span-2' : '';
 
-        if (isPortrait) {
-            spanClass = 'row-span-2';
-            objectPosition = 'object-top'; // Show top portion for portraits
-        } else if (isWide) {
-            spanClass = 'col-span-2';
-        }
-
-        // Add randomness to make grid more organic - using ID for deterministic results
-        const isFeatured = photo.id % 13 === 0; // Make some photos stand out more
-        if (isFeatured) {
-            spanClass = isPortrait ? 'row-span-2 col-span-2' : 'col-span-2 row-span-2';
-        }
+        // Determine object position for better image display
+        const objectPosition = isPortrait
+            ? 'object-top'
+            : isWide
+              ? 'object-center'
+              : 'object-center';
 
         return (
             <div
                 ref={ref}
                 onClick={() => onClick(photo)}
                 className={cn(
-                    'group relative overflow-hidden rounded-xl bg-[#2d2d2f]/30 shadow-sm',
+                    'group relative overflow-hidden rounded-xl bg-accent/30 shadow-sm',
                     'transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer',
                     spanClass,
                     className,
@@ -76,8 +69,11 @@ export const PhotoCard = React.forwardRef<HTMLDivElement, PhotoCardProps>(
                                     return (
                                         <span
                                             key={tag.id}
-                                            className="px-2 py-1 rounded-full text-xs backdrop-blur-lg"
-                                            style={{ backgroundColor: `${tag.color}40` }}
+                                            className="px-2 py-1 rounded-full text-xs text-white backdrop-blur-lg"
+                                            style={{
+                                                backgroundColor: `${tag.color}80`,
+                                                textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                                            }}
                                         >
                                             {tag.name}
                                         </span>

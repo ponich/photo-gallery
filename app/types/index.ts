@@ -1,37 +1,41 @@
-export type Photo = {
+export interface Photo {
+    title?: string;
+    date?: string;
+    orientation?: string;
+    album?: string;
     id: number;
-    album: string;
     url: string;
-    title: string;
-    description: string;
-    date: string;
-    orientation: string;
+    name?: string;
+    description?: string;
+    albumId?: string;
     tags?: string[];
-};
+    createdAt?: string;
+    updatedAt?: string;
+}
 
-export type Tag = {
+export interface Tag {
     id: string;
     name: string;
     color: string;
-};
+}
 
-export type Album = {
+export interface Album {
     id: string;
     name: string;
-};
+}
 
 // Type for photo filtering criteria
-export type FilterCriteria = {
+export interface FilterCriteria {
     album?: string;
     tag?: string | null;
     searchTerm?: string;
-};
+}
 
 // Modal state type to manage various modals in the app
-export type ModalState = {
+export interface ModalState {
     isTagModalOpen: boolean;
     isPhotoTagModalOpen: boolean;
     isAlbumModalOpen: boolean;
     isShareModalOpen: boolean;
     isUploadModalOpen: boolean;
-};
+}
