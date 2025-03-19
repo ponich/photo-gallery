@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Photo, FilterCriteria } from '@/app/types';
+import { useState, useEffect } from 'react';
+import { Photo } from '@/app/types';
 
 /**
  * Hook for filtering photos based on album, tag, and search term
@@ -8,33 +8,40 @@ import { Photo, FilterCriteria } from '@/app/types';
  * @returns Object containing filtered photos and filter state management functions
  */
 export default function usePhotoFilter(photos: Photo[]) {
-    const [selectedAlbum, setSelectedAlbum] = useState('all');
+    const [selectedAlbum, setSelectedAlbum] = useState<string>('all');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [filteredPhotos, setFilteredPhotos] = useState<Photo[]>(photos);
 
-    // Filtered photos based on current criteria
-    const filteredPhotos = useMemo(() => {
-        return photos.filter((photo) => {
-            const matchesAlbum = selectedAlbum === 'all' || photo.album === selectedAlbum;
-            const matchesTag = !selectedTag || (photo.tags && photo.tags.includes(selectedTag));
+    // Update filtered photos when filters or photos change
+    useEffect(() => {
+        const filtered = photos.filter((photo) => {
+            // Filter by album
+            const matchesAlbum =
+                selectedAlbum === 'all' || photo.albumId === selectedAlbum;
+
+            // Filter by tag
+            const matchesTag =
+                !selectedTag || (photo.tags && photo.tags.includes(selectedTag));
+
+            // Filter by search term
+            const photoName = photo.name || '';
+            const photoDesc = photo.description || '';
+            const photoAlbumId = photo.albumId || '';
+
             const matchesSearch =
                 !searchTerm ||
-                photo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                photo.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                photo.album.toLowerCase().includes(searchTerm.toLowerCase());
+                photoName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                photoDesc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                photoAlbumId.toLowerCase().includes(searchTerm.toLowerCase());
 
-            return matchesAlbum && matchesSearch && matchesTag;
+            return matchesAlbum && matchesTag && matchesSearch;
         });
+
+        setFilteredPhotos(filtered);
     }, [photos, selectedAlbum, selectedTag, searchTerm]);
 
-    // Function to set all filter criteria at once
-    const setFilterCriteria = ({ album, tag, searchTerm }: FilterCriteria) => {
-        if (album !== undefined) setSelectedAlbum(album);
-        if (tag !== undefined) setSelectedTag(tag);
-        if (searchTerm !== undefined) setSearchTerm(searchTerm);
-    };
-
-    // Reset all filters
+    // Reset to defaults
     const resetFilters = () => {
         setSelectedAlbum('all');
         setSelectedTag(null);
@@ -51,7 +58,6 @@ export default function usePhotoFilter(photos: Photo[]) {
         setSelectedAlbum,
         setSelectedTag,
         setSearchTerm,
-        setFilterCriteria,
         resetFilters,
     };
 }
