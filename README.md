@@ -1,4 +1,4 @@
-# Photo Gallery App
+# Photo Gallery App =)
 
 A modern photo gallery application built with Next.js.
 
