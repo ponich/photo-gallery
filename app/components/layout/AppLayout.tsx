@@ -76,14 +76,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             {/* Global styles for full background coverage */}
             <style jsx global>{`
                 body {
-                    background-color: #1d1d1f;
                     margin: 0;
                     overflow-x: hidden;
                     min-height: 100vh;
                 }
 
                 html {
-                    background-color: #1d1d1f;
                     overflow-x: hidden;
                 }
             `}</style>

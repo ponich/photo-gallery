@@ -19,8 +19,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <body className={inter.className}>
                 <ThemeProvider
                     attribute="class"
-                    defaultTheme="dark"
-                    enableSystem={false}
+                    defaultTheme="system"
+                    enableSystem={true}
                     storageKey="gallery-theme"
                 >
                     {children}

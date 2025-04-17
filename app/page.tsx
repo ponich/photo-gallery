@@ -114,23 +114,43 @@ export default function Page() {
         [selectedPhoto, filteredPhotos],
     );
 
-    // Handle keyboard navigation
+    // Handle keyboard navigation and close nested modals
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (!selectedPhoto) return;
-
-            if (e.key === 'ArrowLeft') {
-                navigatePhoto('prev');
-            } else if (e.key === 'ArrowRight') {
-                navigatePhoto('next');
-            } else if (e.key === 'Escape') {
-                setSelectedPhoto(null);
+            const key = e.key;
+            // Arrow navigation: close photo tag and share modals, then navigate
+            if (key === 'ArrowLeft' || key === 'ArrowRight') {
+                if (modalState.isPhotoTagModalOpen) {
+                    closePhotoTagModal();
+                }
+                if (modalState.isShareModalOpen) {
+                    closeShareModal();
+                }
+                navigatePhoto(key === 'ArrowLeft' ? 'prev' : 'next');
+            } else if (key === 'Escape') {
+                // Close photo tag or share modal first, if open
+                if (modalState.isPhotoTagModalOpen) {
+                    closePhotoTagModal();
+                } else if (modalState.isShareModalOpen) {
+                    closeShareModal();
+                } else {
+                    setSelectedPhoto(null);
+                }
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedPhoto, filteredPhotos]);
+    }, [
+        selectedPhoto,
+        filteredPhotos,
+        modalState.isPhotoTagModalOpen,
+        modalState.isShareModalOpen,
+        navigatePhoto,
+        closePhotoTagModal,
+        closeShareModal,
+    ]);
 
     // File handling functions
     const handleFiles = (files: FileList) => {
@@ -371,7 +391,16 @@ export default function Page() {
     );
 
     return (
-        <AppLayout
+        <>
+            <input
+                type="file"
+                accept="image/*"
+                multiple
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+            />
+            <AppLayout
             albums={albums}
             tags={tags}
             photos={photos}
@@ -401,9 +430,15 @@ export default function Page() {
             onDeleteAlbum={handleAlbumDelete}
             onDeleteTag={handleTagDelete}
         >
-            <div className="container mx-auto px-4 py-8">
+            <DropZone
+                onFilesDropped={(files) => {
+                    openUploadModal();
+                    handleFiles(files);
+                }}
+                className="container mx-auto px-4 py-8"
+            >
                 <PhotoGrid photos={filteredPhotos} tags={tags} onPhotoSelect={handlePhotoClick} />
-            </div>
+            </DropZone>
 
             {selectedPhoto && (
                 <div className="z-[100]">
@@ -494,5 +529,6 @@ export default function Page() {
                 </div>
             )}
         </AppLayout>
+        </>
     );
 }

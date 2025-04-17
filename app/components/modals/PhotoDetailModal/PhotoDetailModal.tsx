@@ -139,7 +139,7 @@ const PhotoDetailModal: FC<PhotoDetailModalProps> = ({
 
                 {/* Main content area */}
                 <div className="flex-1 relative flex items-center justify-center">
-                    <PhotoImage photo={photo} onNavigate={onNavigate} />
+                    <PhotoImage photo={photo} onNavigate={handleNavigate} />
                 </div>
 
                 {/* Right sidebar */}
